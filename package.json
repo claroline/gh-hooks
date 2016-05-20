@@ -1,0 +1,9 @@
+{
+  "name": "gh-hooks",
+  "version": "1.0.0",
+  "description": "Github webhooks handler for the Claroline project",
+  "main": "index.js",
+  "dependencies": {
+    "unirest": "^0.5.0"
+  }
+}
