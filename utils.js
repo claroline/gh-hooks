@@ -27,39 +27,24 @@ function post(uri, data, onResponse) {
     .end(onResponse)
 }
 
-function makeExecutor(onFail) {
-  return (cmd, args, alias) => {
-    const cmdString = alias ? `"${alias}"` : `"${cmd} ${args.join(' ')}"`
-    console.log(`Executing ${cmdString}...`)
-    const res = spawn(cmd, args)
+function exec(cmd, args, alias) {
+  const cmdString = alias ? `"${alias}"` : `"${cmd} ${args.join(' ')}"`
+  console.log(`Executing ${cmdString}...`)
+  const res = spawn(cmd, args)
 
-    if (res.status !== 0) {
-      console.error(`Failed to execute ${cmdString}`)
-      console.error('Output: ' + (res.stderr || res.stdout || res.error.message))
-      onFail(cmdString)
+  if (res.status !== 0) {
+    console.error(`Failed to execute ${cmdString}`)
 
-      return false
+    if (!alias) {
+        console.error('Output: ' + (res.stderr || res.stdout || res.error.message))
     }
 
-    return true
-  }
-}
-
-function batchCommands(executor, commands) {
-  for (var i = 0, max = commands.length; i < max; ++i) {
-    if (typeof commands[i] === 'function') {
-      if (!commands[i]()) {
-        break
-      }
-    } else if (!executor(...commands[i])) {
-      break
-    }
+    process.exit(1)
   }
 }
 
 module.exports = {
   getParameters,
   post,
-  makeExecutor,
-  batchCommands
+  exec
 }

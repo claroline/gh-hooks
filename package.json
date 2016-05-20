@@ -4,6 +4,7 @@
   "description": "Github webhooks handler for the Claroline project",
   "main": "index.js",
   "dependencies": {
+    "githubhook": "^1.6.1",
     "unirest": "^0.5.0"
   }
 }

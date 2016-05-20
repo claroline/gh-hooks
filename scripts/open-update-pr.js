@@ -6,17 +6,16 @@ if (process.argv.length !== 3) {
   process.exit(1)
 }
 
+const exec = utils.exec
 const pushRef = process.argv[2]
 const params = utils.getParameters()
-const mainRepo = 'https://github.com/claroline/Claroline'
-const distRepo = 'https://github.com/claroline/Distribution'
-const baseBranch = 'monolithic-build'
+const repo = 'https://github.com/claroline/Claroline'
+const base = 'monolithic-build'
 const prBranch = `dist-update-${pushRef}`
 const cloneDir = path.resolve(__dirname, '..', prBranch)
 const authority = `${params.user}:${params.pass}`
 const pushUri = `https://${authority}@github.com/claroline/Claroline`
 const prUri = 'https://api.github.com/repos/claroline/Claroline/pulls'
-const failUri = 'https://api.github.com/repos/claroline/Distribution/issues'
 
 const prBody = `Hi,
 
@@ -30,42 +29,28 @@ If you can't see any changes related to the distribution package, there are good
 const prData = {
   title: 'Update distribution version',
   head: prBranch,
-  base: baseBranch,
+  base: base,
   body: prBody
 }
 
-// if any step fails, open an issue in the distribution repo
-const exec = utils.makeExecutor(cmd => {
-  const data = {
-    title: '[claroline/Claroline] Automatic update failure',
-    body: 'Hi,\n\n The build triggered by claroline/Distribution@' + pushRef + ' failed when executing the command: `' + cmd + '`.',
-    labels: ['failure']
-  }
-  utils.post(failUri, data, response => {
-    console.log(response.status))
-    process.exit(1)
-  }
-})
+exec('rm', ['-rf', cloneDir], 'rm clone dir')
+exec('git', ['clone', '-b', base, repo, cloneDir], 'git clone main repo')
 
-utils.batchCommands(exec, [
-  ['rm', ['-rf', cloneDir], 'rm clone dir'],
-  ['git', ['clone', '-b', baseBranch, mainRepo, cloneDir], 'git clone main repo'],
-  () => { process.chdir(cloneDir); return true },
-  ['git', ['checkout', '-b', prBranch]],
-  ['composer', ['update', 'claroline/distribution', '--no-scripts']],
-  ['git', ['add', 'composer.lock']],
-  ['git', ['config', 'user.name', params.user], 'git set user'],
-  ['git', ['config', 'user.email', params.email], 'git set email'],
-  ['git', ['commit', '-m', 'Update distribution version']],
-  ['git', ['remote', 'set-url', 'origin', pushUri], 'git set-url'],
-  ['git', ['push', '--set-upstream', 'origin', prBranch], 'git push'],
-  ['rm', ['-rf', cloneDir], 'rm clone dir'],
-  () => {
-    // open a PR on the main repo
-    utils.post(prUri, prData, response => {
-      console.log(response.status)
-      process.exit(response.ok ? 0 : 1)
-    })
-  }
-])
+process.chdir(cloneDir)
+
+exec('git', ['checkout', '-b', prBranch])
+exec('composer', ['update', 'claroline/distribution', '--no-scripts'])
+exec('git', ['add', 'composer.lock'])
+exec('git', ['config', 'user.name', params.user], 'git set user')
+exec('git', ['config', 'user.email', params.email], 'git set email')
+exec('git', ['commit', '-m', 'Update distribution version'])
+exec('git', ['remote', 'set-url', 'origin', pushUri], 'git set-url')
+exec('git', ['push', '--set-upstream', 'origin', prBranch], 'git push')
+exec('rm', ['-rf', cloneDir], 'rm clone dir')
+
+// open a PR on the main repo
+utils.post(prUri, prData, response => {
+  console.log(response.status)
+  process.exit(response.ok ? 0 : 1)
+})
 
