@@ -2,7 +2,7 @@ const fs = require('fs')
 const unirest = require('unirest')
 const params = require('./../parameters.json')
 
-if (process.argv.length < 5) {
+if (process.argv.length !== 5) {
   console.log('Usage: node open-issue.js <REPO> <TITLE> <BODY>')
   process.exit(1)
 }
