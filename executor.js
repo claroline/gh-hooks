@@ -1,9 +1,12 @@
 const exec = require('child_process').exec;
+const invariant = require('invariant')
 
 // Factory function for making async process executors using promises.
 // Each executor will be bound to a given logger (which must use the
 // winston log() function signature)
 function makeExec(log) {
+  invariant(log, 'Log function is mandatory')
+
   return cmd => {
     return new Promise((resolve, reject) => {
       log('info', cmd)

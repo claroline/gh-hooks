@@ -1,5 +1,3 @@
-const fs = require('fs')
-const spawn = require('child_process').spawnSync;
 const unirest = require('unirest')
 const params = require('./parameters.json')
 
@@ -19,6 +17,10 @@ function getParameters() {
 }
 
 function post(uri, data, onResponse) {
+  invariant(uri, 'URI is mandatory')
+  invariant(data, 'POST data is mandatory')
+  invariant(onResponse, 'Response callback is mandatory')
+
   unirest
     .post(uri)
     .auth(auth)
@@ -27,24 +29,7 @@ function post(uri, data, onResponse) {
     .end(onResponse)
 }
 
-function exec(cmd, args, alias) {
-  const cmdString = alias ? `"${alias}"` : `"${cmd} ${args.join(' ')}"`
-  console.log(`Executing ${cmdString}...`)
-  const res = spawn(cmd, args)
-
-  if (res.status !== 0) {
-    console.error(`Failed to execute ${cmdString}`)
-
-    if (!alias) {
-        console.error('Output: ' + (res.stderr || res.stdout || res.error.message))
-    }
-
-    process.exit(1)
-  }
-}
-
 module.exports = {
   getParameters,
-  post,
-  exec
+  post
 }

@@ -1,31 +1,22 @@
 const githubhook = require('githubhook')
 const params = require('./parameters.json')
+const buildMainUpdate = require('./handler/build-main-update')
+const openUpdatePr = require('./handler/open-update-pr')
+const reportUpdateFailure = require('./handler/report-update-failure')
 
 const github = githubhook({
   port: params.port,
+  path: '/payload',
   secret: params.secret
 })
 
 github.listen();
 
-github.on('*', function (event, repo, ref, data) {
+github.on('push:Distribution:refs/heads/master', data => {
+  const ref = data.head_commit.id
 
-  console.log('Received smth')
-
-});
-
-github.on('event', function (repo, ref, data) {
-});
-
-github.on('event:reponame', function (ref, data) {
-});
-
-github.on('event:reponame:ref', function (data) {
-});
-
-github.on('reponame', function (event, ref, data) {
-});
-
-github.on('reponame:ref', function (event, data) {
-});
-
+  buildMainUpdate(ref)
+    .then(() => openUpdatePr(ref))
+    .catch(error => reportUpdateFailure(ref, error.message))
+  }
+})

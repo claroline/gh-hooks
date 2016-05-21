@@ -1,4 +1,5 @@
 const util = require('util')
+const invariant = require('invariant')
 const winston = require('winston')
 const RotateTransport = require('winston-daily-rotate-file')
 
@@ -15,9 +16,7 @@ function MemoryTransport(options) {
 util.inherits(MemoryTransport, winston.Transport)
 
 MemoryTransport.prototype.log = function (level, msg, meta, callback) {
-  if (!meta || !meta.sessionId) {
-    throw new Error('Session identifier is mandatory')
-  }
+  invariant(meta && meta.sessionId, 'Session identifier is mandatory')
 
   this.logs[meta.sessionId] = this.logs[meta.sessionId] || '';
   this.logs[meta.sessionId] += msg + '\n';
@@ -37,7 +36,9 @@ MemoryTransport.prototype.flush = function (sessionId) {
 
 // Building a winston logger with rotate file and memory session transports.
 const memory = new MemoryTransport()
-const rotate = new RotateTransport({ filename: 'logs/rotate.log' })
+const rotate = new RotateTransport({
+  filename: __dirname + '/logs/rotate.log'
+})
 const logger = new (winston.Logger)({
   transports: [memory, rotate]
 })
@@ -46,9 +47,7 @@ const logger = new (winston.Logger)({
 // given session id. The returned function also has flush()/close()
 // methods to access and delete accumulated session logs.
 function makeSessionLogger(sessionId) {
-  if (!sessionId) {
-    throw new Error('Session identifier is mandatory')
-  }
+  invariant(sessionId, 'Session identifier is mandatory')
 
   const log = (level, msg) => {
     logger.log(level, msg, { sessionId })
