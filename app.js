@@ -1,5 +1,5 @@
 const githubhook = require('githubhook')
-const params = require('./parameters.json')
+const params = require('./parameters')
 const buildMainUpdate = require('./handler/build-main-update')
 const openUpdatePr = require('./handler/open-update-pr')
 const reportUpdateFailure = require('./handler/report-update-failure')

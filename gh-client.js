@@ -1,5 +1,5 @@
 const unirest = require('unirest')
-const params = require('./parameters.json')
+const params = require('./parameters')
 
 const auth = {
   user: params.user,

@@ -2,7 +2,7 @@ const path = require('path')
 const invariant = require('invariant')
 const makeLog = require('./../logger')
 const makeExec = require('./../executor')
-const params = require('./../parameters.json')
+const params = require('./../parameters')
 
 const repo = 'https://github.com/claroline/Claroline'
 const base = 'monolithic-build'
