@@ -12,10 +12,6 @@ const headers = {
   'User-Agent': 'node.js client'
 }
 
-function getParameters() {
-  return params
-}
-
 function post(uri, data, onResponse) {
   invariant(uri, 'URI is mandatory')
   invariant(data, 'POST data is mandatory')
@@ -29,7 +25,4 @@ function post(uri, data, onResponse) {
     .end(onResponse)
 }
 
-module.exports = {
-  getParameters,
-  post
-}
+module.exports = { post }

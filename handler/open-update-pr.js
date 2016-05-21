@@ -1,6 +1,6 @@
 const path = require('path')
 const invariant = require('invariant')
-const utils = require('./../utils')
+const client = require('./../gh-client')
 
 const repo = 'https://github.com/claroline/Claroline'
 const base = 'monolithic-build'
@@ -27,7 +27,7 @@ If you can't see any changes related to the distribution package, there are good
   }
 
   return new Promise((resolve, reject) => {
-    utils.post(prUri, prData, response => {
+    client.post(prUri, prData, response => {
       if (response.ok) {
         resolve(response.status)
       } else {

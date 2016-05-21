@@ -1,5 +1,5 @@
-const utils = require('./../utils')
 const invariant = require('invariant')
+const client = require('./../gh-client')
 const issueUri = 'https://api.github.com/repos/claroline/Distribution/issues'
 
 function reportBuildFailure(pushRef, log) {
@@ -20,7 +20,7 @@ ${log}
   }
 
   return new Promise((resolve, reject) => {
-    utils.post(issueUri, issue, response => {
+    client.post(issueUri, issue, response => {
       if (response.ok) {
         resolve(response.status)
       } else {
