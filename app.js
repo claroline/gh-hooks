@@ -6,8 +6,8 @@ const openUpdatePr = require('./handler/open-update-pr')
 const reportUpdateFailure = require('./handler/report-update-failure')
 
 const github = githubhook({
-  port: process.env.APP_PORT,
   path: '/payload',
+  port: process.env.APP_PORT,
   secret: process.env.HOOKS_SECRET
 })
 
@@ -17,7 +17,10 @@ github.on('push:Distribution:refs/heads/master', data => {
   const ref = data.head_commit.id
 
   buildMainUpdate(ref)
-    .then(() => openUpdatePr(ref))
-    .catch(error => reportUpdateFailure(ref, error.message))
+    .then(
+      () => openUpdatePr(ref),
+      err => reportUpdateFailure(ref, err.message)
+    )
+    .catch(err => console.error(err))
   }
 })
