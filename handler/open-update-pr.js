@@ -12,11 +12,14 @@ function sendUpdatePr(pushRef) {
   const prBranch = `dist-update-${pushRef}`
   const prBody = `Hi,
 
-This PR updates the \`claroline/distribution\` package and its dependencies. It was triggered by a push on the master branch of *claroline/Distribution* (ref: claroline/Distribution@${pushRef}).
+This PR updates the \`claroline/distribution\` package and its dependencies.
+It was triggered by a push on the master branch of *claroline/Distribution*
+(ref: claroline/Distribution@${pushRef}).
 
 ***PLEASE CHECK THE LOCK FILE BEFORE MERGING***
 
-If you can't see any changes related to the distribution package, there are good chances that the packagist hook didn't work.
+If you can't see any changes related to the distribution package, there are
+good chances that the packagist hook didn't work.
 `
 
   const prData = {
