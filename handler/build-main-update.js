@@ -1,19 +1,23 @@
 const path = require('path')
 const invariant = require('invariant')
-const makeLog = require('./../logger')
 const makeExec = require('./../executor')
 
 const repo = 'https://github.com/claroline/Claroline'
 const base = 'monolithic-build'
 const pushUri = `https://$BOT_USER:$BOT_PASS@github.com/claroline/Claroline`
 
-function buildMainUpdate(pushRef) {
+function buildMainUpdate(pushRef, logger) {
   invariant(pushRef, 'Push commit reference is mandatory')
+  invariant(pushRef, 'Logger function is mandatory')
+
+  let output = ''
 
   const prBranch = `dist-update-${pushRef}`
   const cloneDir = path.resolve(__dirname, '..', prBranch)
-
-  const log = makeLog(`main-update-${pushRef}`)
+  const log = (level, msg) => {
+    output += msg
+    logger(level, msg)
+  }
   const exec = makeExec(log)
 
   return exec(`rm -rf ${cloneDir}`)
@@ -29,13 +33,10 @@ function buildMainUpdate(pushRef) {
     .then(() => exec(`git remote set-url origin ${pushUri}`))
     .then(() => exec(`git push --set-upstream origin ${prBranch}`))
     .then(() => exec(`rm -rf ${cloneDir}`))
-    .then(() => {
-      log('info', 'Success')
-      log.close()
-    })
+    .then(() => log('info', 'Build succeeded'))
     .catch(error => {
       log('error', error.message)
-      throw new Error(log.flush())
+      throw new Error(output)
     })
 }
 

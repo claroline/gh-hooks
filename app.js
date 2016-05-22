@@ -4,6 +4,7 @@ const githubhook = require('githubhook')
 const buildMainUpdate = require('./handler/build-main-update')
 const openUpdatePr = require('./handler/open-update-pr')
 const reportUpdateFailure = require('./handler/report-update-failure')
+const logger = require('./logger')
 
 const github = githubhook({
   path: '/payload',
@@ -15,12 +16,14 @@ github.listen();
 
 github.on('push:Distribution:refs/heads/master', data => {
   const ref = data.head_commit.id
+  const jobId = `main-update-${ref}`
+  const log = (level, msg) => logger.log(level, msg, { jobId })
 
-  buildMainUpdate(ref)
+  buildMainUpdate(ref, log)
     .then(
       () => openUpdatePr(ref),
       err => reportUpdateFailure(ref, err.message)
     )
-    .catch(err => console.error(err))
+    .catch(err => log('error', err.message))
   }
 })

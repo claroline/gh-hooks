@@ -31,7 +31,9 @@ If you can't see any changes related to the distribution package, there are good
       if (response.ok) {
         resolve(response.status)
       } else {
-        reject(new Error(response.status))
+        reject(new Error(
+          `Failed to open PR for main repo update (${response.status})`
+        ))
       }
     })
   })
