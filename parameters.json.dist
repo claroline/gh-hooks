@@ -1,7 +1,0 @@
-{
-  "user": "bot_gh_username",
-  "pass": "bot_gh_password",
-  "email": "bot_gh_email",
-  "secret": "webhooks_secret",
-  "port": "application_port"
-}

@@ -1,9 +1,8 @@
 const unirest = require('unirest')
-const params = require('./parameters')
 
 const auth = {
-  user: params.user,
-  pass: params.pass
+  user: process.env.BOT_USER,
+  pass: process.env.BOT_PASS
 }
 
 const headers = {

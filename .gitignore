@@ -1,6 +1,6 @@
 !.gitempty
+.env
 dist-update*
 logs
 node_modules
 npm-debug.log
-parameters.json

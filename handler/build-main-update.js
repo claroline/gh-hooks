@@ -2,12 +2,10 @@ const path = require('path')
 const invariant = require('invariant')
 const makeLog = require('./../logger')
 const makeExec = require('./../executor')
-const params = require('./../parameters')
 
 const repo = 'https://github.com/claroline/Claroline'
 const base = 'monolithic-build'
-const authority = `${params.user}:${params.pass}`
-const pushUri = `https://${authority}@github.com/claroline/Claroline`
+const pushUri = `https://$BOT_USER:$BOT_PASS@github.com/claroline/Claroline`
 
 function buildMainUpdate(pushRef) {
   invariant(pushRef, 'Push commit reference is mandatory')
@@ -25,8 +23,8 @@ function buildMainUpdate(pushRef) {
     .then(() => exec(`git checkout -b ${prBranch}`))
     .then(() => exec(`composer update claroline/distribution --no-scripts`))
     .then(() => exec(`git add composer.lock`))
-    .then(() => exec(`git config user.name ${params.user}`))
-    .then(() => exec(`git config user.email ${params.email}`))
+    .then(() => exec(`git config user.name $BOT_USER`))
+    .then(() => exec(`git config user.email $BOT_EMAIL`))
     .then(() => exec(`git commit -m 'Update distribution version'`))
     .then(() => exec(`git remote set-url origin ${pushUri}`))
     .then(() => exec(`git push --set-upstream origin ${prBranch}`))

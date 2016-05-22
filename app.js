@@ -1,13 +1,14 @@
+require('dotenv').config()
+
 const githubhook = require('githubhook')
-const params = require('./parameters')
 const buildMainUpdate = require('./handler/build-main-update')
 const openUpdatePr = require('./handler/open-update-pr')
 const reportUpdateFailure = require('./handler/report-update-failure')
 
 const github = githubhook({
-  port: params.port,
+  port: process.env.APP_PORT,
   path: '/payload',
-  secret: params.secret
+  secret: process.env.HOOKS_SECRET
 })
 
 github.listen();
