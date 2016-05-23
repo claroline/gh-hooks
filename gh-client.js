@@ -12,17 +12,21 @@ const headers = {
   'User-Agent': 'node.js client'
 }
 
-function post(uri, data, onResponse) {
+function post(uri, data) {
   invariant(uri, 'URI is mandatory')
   invariant(data, 'POST data is mandatory')
-  invariant(onResponse, 'Response callback is mandatory')
 
-  unirest
-    .post(uri)
-    .auth(auth)
-    .headers(headers)
-    .send(data)
-    .end(onResponse)
+  return new Promise((resolve, reject) => {
+    unirest
+      .post(uri)
+      .auth(auth)
+      .headers(headers)
+      .send(data)
+      .end(response => {
+        const msg = `POST ${uri} ${response.status}`
+        response.ok ? resolve(msg) : reject(new Error(msg))
+      })
+  })
 }
 
 module.exports = { post }

@@ -29,17 +29,7 @@ good chances that the packagist hook didn't work.
     body: prBody
   }
 
-  return new Promise((resolve, reject) => {
-    client.post(prUri, prData, response => {
-      if (response.ok) {
-        resolve(response.status)
-      } else {
-        reject(new Error(
-          `Failed to open PR for main repo update (${response.status})`
-        ))
-      }
-    })
-  })
+  return client.post(prUri, prData)
 }
 
 module.exports = sendUpdatePr

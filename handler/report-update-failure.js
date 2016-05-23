@@ -19,17 +19,7 @@ ${buildLog}
     labels: ['failure']
   }
 
-  return new Promise((resolve, reject) => {
-    client.post(issueUri, issue, response => {
-      if (response.ok) {
-        resolve(response.status)
-      } else {
-        reject(new Error(
-          `Failed to open issue for build failure (${response.status})`
-        ))
-      }
-    })
-  })
+  return client.post(issueUri, issue)
 }
 
 module.exports = reportBuildFailure
