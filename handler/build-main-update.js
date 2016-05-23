@@ -10,7 +10,7 @@ function buildMainUpdate(pushRef, logger) {
   invariant(pushRef, 'Push commit reference is mandatory')
   invariant(pushRef, 'Logger function is mandatory')
 
-  let output = ''
+  var output = ''
 
   const prBranch = `dist-update-${pushRef}`
   const cloneDir = path.resolve(__dirname, '..', prBranch)
