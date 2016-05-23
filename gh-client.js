@@ -1,3 +1,4 @@
+const invariant = require('invariant')
 const unirest = require('unirest')
 
 const auth = {
