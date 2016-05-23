@@ -2,7 +2,9 @@
   "name": "gh-hooks",
   "version": "1.0.0",
   "description": "Github webhooks handler for the Claroline project",
-  "main": "index.js",
+  "scripts": {
+    "start": "node app.js"
+  },
   "dependencies": {
     "dotenv": "^2.0.0",
     "githubhook": "^1.6.1",
