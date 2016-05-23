@@ -4,7 +4,6 @@ const makeExec = require('./../executor')
 
 const repo = 'https://github.com/claroline/Claroline'
 const base = 'monolithic-build'
-const pushUri = `https://$BOT_USER:$BOT_PASS@github.com/claroline/Claroline`
 
 function buildMainUpdate(pushRef, logger) {
   invariant(pushRef, 'Push commit reference is mandatory')
@@ -29,7 +28,7 @@ function buildMainUpdate(pushRef, logger) {
     .then(() => exec(`git config user.name $BOT_USER`))
     .then(() => exec(`git config user.email $BOT_EMAIL`))
     .then(() => exec(`git commit -m 'Update distribution version'`))
-    .then(() => exec(`git remote set-url origin ${pushUri}`))
+    .then(() => exec(`git remote set-url origin ${repo}`))
     .then(() => exec(`git push --set-upstream --force origin ${prBranch}`))
     .then(() => exec(`rm -rf ${cloneDir}`))
     .then(() => log('info', 'Build succeeded'))
