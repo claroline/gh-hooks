@@ -25,5 +25,4 @@ github.on('push:Distribution:refs/heads/master', data => {
       err => reportUpdateFailure(ref, err.message)
     )
     .catch(err => log('error', err.message))
-  }
 })

@@ -30,6 +30,6 @@ ${buildLog}
       }
     })
   })
-})
+}
 
 module.exports = reportBuildFailure
