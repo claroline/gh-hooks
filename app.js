@@ -24,5 +24,5 @@ github.on('push:Distribution:refs/heads/master', data => {
       () => openUpdatePr(ref),
       err => reportUpdateFailure(ref, err.message)
     )
-    .catch(err => log('error', err.message))
+    .catch(err => log('error', `Build failure: ${err.message}`))
 })
