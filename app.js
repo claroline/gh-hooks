@@ -21,7 +21,7 @@ github.on('push:Distribution:refs/heads/master', data => {
   const log = (level, msg) => logger.log(level, msg, { jobId })
 
   // wait for packagist ref to be updated
-  wait(30 * 1000)
+  wait(120 * 1000)
     .then(() => buildMainUpdate(ref, log))
     .then(
       () => openUpdatePr(ref),
