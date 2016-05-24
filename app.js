@@ -16,11 +16,11 @@ const github = githubhook({
 github.listen();
 
 // When a push happens on the master branch of claroline/Distribution,
-// update composer depedencies of claroline/Claroline and open a PR
+// update composer dependencies of claroline/Claroline and open a PR
 github.on('push:Distribution:refs/heads/master', data => {
   const ref = data.head_commit.id
   const jobId = `main-update-${ref}`
-  const log = msg => console.log(`${jobId}: msg`)
+  const log = msg => console.log(`${jobId}: ${msg}`)
 
   // wait for packagist ref to be updated
   wait(120 * 1000)
@@ -38,7 +38,7 @@ github.on('pull_request:Distribution', (ref, data) => {
   if (data.action === 'closed') {
     const prNumber = data.number
     const jobId = `delete-previews-${prNumber}`
-    const log = msg => console.log(`${jobId}: msg`)
+    const log = msg => console.log(`${jobId}: ${msg}`)
     deletePreviews(prNumber, log)
       .catch(err => log(`Cannot remove previews: ${err.message}`))
   }
