@@ -26,7 +26,7 @@ function buildMainUpdate(pushRef, logger) {
     .then(() => process.chdir(cloneDir))
     .then(() => exec(`git checkout -b ${prBranch}`))
     .then(() => exec(`composer update claroline/distribution --no-scripts`))
-    .then(() => checkDistVersion(path.resolve(cloneDir, 'composer.lock', pushRef)))
+    .then(() => checkDistVersion(path.resolve(cloneDir, 'composer.lock'), pushRef))
     .then(() => exec(`git add composer.lock`))
     .then(() => exec(`git config user.name $BOT_USER`))
     .then(() => exec(`git config user.email $BOT_EMAIL`))
