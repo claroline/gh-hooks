@@ -1,11 +1,11 @@
 require('dotenv').config({ path: __dirname + '/.env' })
 
 const githubhook = require('githubhook')
-const buildMainUpdate = require('./handler/build-main-update')
-const openUpdatePr = require('./handler/open-update-pr')
-const reportUpdateFailure = require('./handler/report-update-failure')
-const deletePreviews = require('./handler/delete-previews')
-const wait = require('./wait')
+const buildMainUpdate = require('./lib/handler/build-main-update')
+const openUpdatePr = require('./lib/handler/open-update-pr')
+const reportUpdateFailure = require('./lib/handler/report-update-failure')
+const deletePreviews = require('./lib/handler/delete-previews')
+const wait = require('./lib/wait')
 
 const github = githubhook({
   path: '/payload',
@@ -44,7 +44,7 @@ github.on('pull_request:Distribution', (ref, data) => {
     const log = msg => console.log(`${jobId}: ${msg}`)
     deletePreviews(prNumber, log)
       .then(
-        () => log('Previews deleted')
+        () => log('Previews deleted'),
         err => log(`Cannot remove previews: ${err.message}`)
       )
   }
