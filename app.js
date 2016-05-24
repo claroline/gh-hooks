@@ -5,6 +5,7 @@ const buildMainUpdate = require('./handler/build-main-update')
 const openUpdatePr = require('./handler/open-update-pr')
 const reportUpdateFailure = require('./handler/report-update-failure')
 const logger = require('./logger')
+const wait = require('./wait')
 
 const github = githubhook({
   path: '/payload',
@@ -19,7 +20,9 @@ github.on('push:Distribution:refs/heads/master', data => {
   const jobId = `main-update-${ref}`
   const log = (level, msg) => logger.log(level, msg, { jobId })
 
-  buildMainUpdate(ref, log)
+  // wait for packagist ref to be updated
+  wait(30 * 1000)
+    .then(() => buildMainUpdate(ref, log))
     .then(
       () => openUpdatePr(ref),
       err => reportUpdateFailure(ref, err.message)
