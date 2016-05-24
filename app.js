@@ -5,7 +5,6 @@ const buildMainUpdate = require('./handler/build-main-update')
 const openUpdatePr = require('./handler/open-update-pr')
 const reportUpdateFailure = require('./handler/report-update-failure')
 const deletePreviews = require('./handler/delete-previews')
-const logger = require('./logger')
 const wait = require('./wait')
 
 const github = githubhook({
@@ -21,7 +20,7 @@ github.listen();
 github.on('push:Distribution:refs/heads/master', data => {
   const ref = data.head_commit.id
   const jobId = `main-update-${ref}`
-  const log = (level, msg) => logger.log(level, msg, { jobId })
+  const log = msg => console.log(`${jobId}: msg`)
 
   // wait for packagist ref to be updated
   wait(120 * 1000)
@@ -30,7 +29,7 @@ github.on('push:Distribution:refs/heads/master', data => {
       () => openUpdatePr(ref),
       err => reportUpdateFailure(ref, err.message)
     )
-    .catch(err => log('error', `Build failure: ${err.message}`))
+    .catch(err => log(`Build failure: ${err.message}`))
 })
 
 // When a PR is closed in claroline/Distribution, delete any
@@ -39,8 +38,8 @@ github.on('pull_request:Distribution', (ref, data) => {
   if (data.action === 'closed') {
     const prNumber = data.number
     const jobId = `delete-previews-${prNumber}`
-    const log = (level, msg) => logger.log(level, msg, { jobId })
+    const log = msg => console.log(`${jobId}: msg`)
     deletePreviews(prNumber, log)
-      .catch(err => log('error', `Cannot remove previews: ${err.message}`))
+      .catch(err => log(`Cannot remove previews: ${err.message}`))
   }
 })

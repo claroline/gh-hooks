@@ -9,10 +9,10 @@ function makeExec(log) {
 
   return cmd => {
     return new Promise((resolve, reject) => {
-      log('info', cmd)
+      log(cmd)
       const child = exec(cmd)
-      child.stdout.on('data', data => log('info', data))
-      child.stderr.on('data', data => log('error', data))
+      child.stdout.on('data', log)
+      child.stderr.on('data', log)
       child.on('close', code => {
         code === 0 ?
           resolve(0) :

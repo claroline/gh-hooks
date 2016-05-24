@@ -15,9 +15,9 @@ function buildMainUpdate(pushRef, logger) {
   const prBranch = `dist-update-${pushRef}`
   const originalDir = process.cwd()
   const cloneDir = path.resolve(__dirname, '..', prBranch)
-  const log = (level, msg) => {
+  const log = msg => {
     output += msg + '\n'
-    logger(level, msg)
+    logger(msg)
   }
   const exec = makeExec(log)
 
@@ -36,11 +36,11 @@ function buildMainUpdate(pushRef, logger) {
     .then(() => exec(`rm -rf ${cloneDir}`))
     .then(() => {
       process.chdir(originalDir)
-      log('info', 'Build succeeded')
+      log('Build succeeded')
     })
     .catch(error => {
       process.chdir(originalDir)
-      log('error', error.message)
+      log(error.message)
       throw new Error(output)
     })
 }
