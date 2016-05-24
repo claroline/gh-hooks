@@ -1,3 +1,4 @@
+const fs = require('fs')
 const path = require('path')
 const invariant = require('invariant')
 const makeExec = require('./../executor')
@@ -25,6 +26,7 @@ function buildMainUpdate(pushRef, logger) {
     .then(() => process.chdir(cloneDir))
     .then(() => exec(`git checkout -b ${prBranch}`))
     .then(() => exec(`composer update claroline/distribution --no-scripts`))
+    .then(() => checkDistVersion(path.resolve(cloneDir, 'composer.lock', pushRef)))
     .then(() => exec(`git add composer.lock`))
     .then(() => exec(`git config user.name $BOT_USER`))
     .then(() => exec(`git config user.email $BOT_EMAIL`))
@@ -41,6 +43,42 @@ function buildMainUpdate(pushRef, logger) {
       log('error', error.message)
       throw new Error(output)
     })
+}
+
+function checkDistVersion(lockFile, expectedRef) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(lockFile, 'utf8', (err, data) => {
+      if (err) {
+        return reject(err)
+      }
+
+      var lock;
+
+      try {
+        lock = JSON.parse(data)
+      } catch (err) {
+        return reject(new Error('Cannot parse composer.lock'))
+      }
+
+      const dist = lock.packages
+        .find(package => package.name === 'claroline/distribution')
+
+      if (!dist) {
+        return reject(new Error(
+          'Cannot find claroline/distribution in composer.lock'
+        ))
+      }
+
+      if (dist.source.reference !== expectedRef) {
+        return reject(new Error(`
+Expected reference ${expectedRef} for claroline/distribution in updated
+composer.lock, found ${dist.source.reference}. Make sure the packagist
+hook worked properly.`))
+      }
+
+      resolve('Versions match')
+    })
+  })
 }
 
 module.exports = buildMainUpdate
