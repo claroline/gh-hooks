@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config({ path: __dirname + '/.env' })
 
 const githubhook = require('githubhook')
 const buildMainUpdate = require('./handler/build-main-update')
