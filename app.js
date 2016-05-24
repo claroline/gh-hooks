@@ -29,7 +29,10 @@ github.on('push:Distribution:refs/heads/master', data => {
       () => openUpdatePr(ref),
       err => reportUpdateFailure(ref, err.message)
     )
-    .catch(err => log(`Build failure: ${err.message}`))
+    .then(
+      log, 
+      err => log(`Build failure: ${err.message}`)
+    )
 })
 
 // When a PR is closed in claroline/Distribution, delete any
@@ -40,6 +43,9 @@ github.on('pull_request:Distribution', (ref, data) => {
     const jobId = `delete-previews-${prNumber}`
     const log = msg => console.log(`${jobId}: ${msg}`)
     deletePreviews(prNumber, log)
-      .catch(err => log(`Cannot remove previews: ${err.message}`))
+      .then(
+        () => log('Previews deleted')
+        err => log(`Cannot remove previews: ${err.message}`)
+      )
   }
 })
