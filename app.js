@@ -1,11 +1,14 @@
 require('dotenv').config({ path: __dirname + '/.env' })
 
 const githubhook = require('githubhook')
-const buildMainUpdate = require('./lib/handler/build-main-update')
-const openUpdatePr = require('./lib/handler/open-update-pr')
-const reportUpdateFailure = require('./lib/handler/report-update-failure')
-const deletePreviews = require('./lib/handler/delete-previews')
-const wait = require('./lib/wait')
+const buildMainUpdate = require('./lib/job/build-main-update')
+const deletePreviews = require('./lib/job/delete-previews')
+const api = require('./lib/gh-client')
+const msg = require('./lib/messages')
+const util = require('./lib/utils')
+
+const main = 'claroline/Claroline'
+const dist = 'claroline/Distribution'
 
 const github = githubhook({
   path: '/payload',
@@ -19,20 +22,16 @@ github.listen();
 // update composer dependencies of claroline/Claroline and open a PR
 github.on('push:Distribution:refs/heads/master', data => {
   const ref = data.head_commit.id
-  const jobId = `main-update-${ref}`
-  const log = msg => console.log(`${jobId}: ${msg}`)
+  const log = util.makeLog(`main-update-${ref}`)
 
   // wait for packagist ref to be updated
-  wait(120 * 1000)
+  util.wait(120 * 1000)
     .then(() => buildMainUpdate(ref, log))
     .then(
-      () => openUpdatePr(ref),
-      err => reportUpdateFailure(ref, err.message)
+      () => api.openPr(main, 'master', `update-${ref}`, msg.updatePr, [ref]),
+      err => api.openIssue(dist, msg.updateFail, [ref, err.message])
     )
-    .then(
-      log, 
-      err => log(`Build failure: ${err.message}`)
-    )
+    .then(log, err => log(`Build failure: ${err.message}`))
 })
 
 // When a PR is closed in claroline/Distribution, delete any
@@ -40,12 +39,39 @@ github.on('push:Distribution:refs/heads/master', data => {
 github.on('pull_request:Distribution', (ref, data) => {
   if (data.action === 'closed') {
     const prNumber = data.number
-    const jobId = `delete-previews-${prNumber}`
-    const log = msg => console.log(`${jobId}: ${msg}`)
+    const log = util.makeLog(`delete-previews-${prNumber}`)
+
     deletePreviews(prNumber, log)
       .then(
         () => log('Previews deleted'),
         err => log(`Cannot remove previews: ${err.message}`)
       )
   }
+})
+
+// When the status of an automated update PR on claroline/Claroline
+// is green, merge that PR automatically; if it's red, open an issue
+// in claroline/Distribution
+github.on('status:Claroline', (ref, data) => {
+  if (data.commit.author.login !== process.env.BOT_USER
+    || data.state === 'pending') {
+    return
+  }
+
+  const commit = data.commit.sha
+  const log = util.makeLog(`update-pr-status-${commit}`)
+
+  api.findPr(main, process.env.BOT_USER, commit)
+    .then(
+      pr => data.state === 'success' ?
+        api.mergePr(main, pr) :
+        api.openIssue(dist, msg.updatePrFail, [pr.number, data.state])
+    )
+    .then(
+      () => log('Update PR merged'),
+      err => {
+        log(err.message)
+        api.openIssue(dist, msg.updateStatusFail, [commit, err.message])
+      }
+    )
 })
