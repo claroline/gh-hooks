@@ -64,7 +64,7 @@ github.on('status:Claroline', (ref, data) => {
   api.findPr(main, process.env.BOT_USER, commit)
     .then(
       pr => data.state === 'success' ?
-        api.mergePr(main, pr) :
+        api.mergePr(main, pr, 'Update distribution version') :
         api.openIssue(dist, msg.updatePrFail, [pr.number, data.state])
     )
     .then(
