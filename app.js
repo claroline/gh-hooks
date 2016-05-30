@@ -16,7 +16,7 @@ const github = githubhook({
   secret: process.env.HOOKS_SECRET
 })
 
-github.listen();
+github.listen()
 
 // When a push happens on the master branch of claroline/Distribution,
 // update composer dependencies of claroline/Claroline and open a PR
